@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useEffect, useRef, useMemo } from "react";
 import {
   StyleSheet,
   Text,
@@ -14,10 +14,34 @@ const WINDOW_HEIGHT = Dimensions.get("window").height;
 const MINI_HEIGHT = 64;
 const SNAP_POINTS = [57, WINDOW_HEIGHT - MINI_HEIGHT];
 
-type ModalState = "full" | "mini";
+function usePrevious<T>(value: T): T {
+  const ref = useRef<T>();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
+}
 
-const PodcastLikeSemiModalView: React.FC = () => {
-  const [modalState, setModalState] = useState<ModalState>("full");
+export type ModalState = "full" | "mini";
+
+type Props = {
+  modalState: ModalState;
+  setModalState(modalState: ModalState): void;
+};
+
+const PodcastLikeSemiModalView: React.FC<Props> = props => {
+  const { modalState, setModalState } = props;
+
+  const prevModalState = usePrevious(modalState);
+
+  useEffect(() => {
+    if (prevModalState !== "full" && modalState === "full") {
+      switchModalState("full");
+    }
+    if (prevModalState !== "mini" && modalState === "mini") {
+      switchModalState("mini");
+    }
+  }, [modalState]);
 
   const dragY = useMemo(() => new Animated.Value(0), []);
   const lastStopSnapPoint = useMemo(
@@ -131,128 +155,86 @@ const PodcastLikeSemiModalView: React.FC = () => {
   };
 
   return (
-    <>
-      <View style={styles.groundwork}>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => switchModalState("full")}
-          >
-            <Text>Full</Text>
-          </TouchableOpacity>
-          {/* <TouchableOpacity
-            disabled
-            style={styles.button}
-            onPress={() => switchModalState("half")}
-          >
-            <Text>Half</Text>
-          </TouchableOpacity> */}
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => switchModalState("mini")}
-          >
-            <Text>Mini</Text>
-          </TouchableOpacity>
-        </View>
-        <Text style={styles.state}>{modalState}</Text>
-      </View>
-
-      <PanGestureHandler
-        onGestureEvent={Animated.event(
-          [{ nativeEvent: { translationY: dragY } }],
-          { useNativeDriver: false }
-        )}
-        onHandlerStateChange={Animated.event([], {
-          listener: onHandlerStateChange
-        })}
+    <PanGestureHandler
+      onGestureEvent={Animated.event(
+        [{ nativeEvent: { translationY: dragY } }],
+        { useNativeDriver: false }
+      )}
+      onHandlerStateChange={Animated.event([], {
+        listener: onHandlerStateChange
+      })}
+    >
+      <Animated.View
+        style={[
+          styles.modalView,
+          {
+            transform: [{ translateY }],
+            borderTopLeftRadius: borderRadius,
+            borderTopRightRadius: borderRadius
+          }
+        ]}
       >
-        <Animated.View
-          style={[
-            styles.modalView,
-            {
-              transform: [{ translateY }],
-              borderTopLeftRadius: borderRadius,
-              borderTopRightRadius: borderRadius
-            }
-          ]}
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => switchModalState("full")}
         >
-          <TouchableOpacity
-            activeOpacity={1}
-            onPress={() => switchModalState("full")}
+          <Animated.View
+            style={[
+              styles.full_contentWrapper,
+              {
+                opacity: fullOpacity,
+                paddingTop: fullContentWrapperPaddingTop
+              }
+            ]}
           >
-            <Animated.View
-              style={[
-                styles.full_contentWrapper,
-                {
-                  opacity: fullOpacity,
-                  paddingTop: fullContentWrapperPaddingTop
-                }
-              ]}
+            <View style={styles.pseudoSeekbar} />
+            <Text style={styles.full_title} numberOfLines={1}>
+              #005 The Gratest Episode in the World
+            </Text>
+            <TouchableOpacity
+              style={[styles.button, { marginTop: 16 }]}
+              onPress={() => switchModalState("mini")}
             >
-              <View style={styles.pseudoSeekbar} />
-              <Text style={styles.full_title} numberOfLines={1}>
-                #005 The Gratest Episode in the World
-              </Text>
-              <TouchableOpacity
-                style={[styles.button, { marginTop: 16 }]}
-                onPress={() => switchModalState("mini")}
-              >
-                <Text>Mini</Text>
-              </TouchableOpacity>
-            </Animated.View>
+              <Text>Mini</Text>
+            </TouchableOpacity>
+          </Animated.View>
 
-            <Animated.View style={[styles.mini, { opacity: miniOpacity }]}>
-              <Text style={styles.mini_title} numberOfLines={1}>
-                #005 The Gratest Episode in the World
-              </Text>
-            </Animated.View>
-            <View style={styles.gripBarWrapper}>
-              <Animated.View
-                style={[styles.gripBar, { opacity: fullOpacity }]}
-              />
-            </View>
-            <Animated.Image
-              style={[
-                styles.artwork,
-                {
-                  height: artworkSize,
-                  width: artworkSize,
-                  borderRadius: artworkBorderRadius,
-                  top: artworkTop,
-                  left: artworkLeft
-                }
-              ]}
-              source={require("./assets/artwork.jpg")}
-            />
-          </TouchableOpacity>
-        </Animated.View>
-      </PanGestureHandler>
-    </>
+          <Animated.View style={[styles.mini, { opacity: miniOpacity }]}>
+            <Text style={styles.mini_title} numberOfLines={1}>
+              #005 The Gratest Episode in the World
+            </Text>
+          </Animated.View>
+          <View style={styles.gripBarWrapper}>
+            <Animated.View style={[styles.gripBar, { opacity: fullOpacity }]} />
+          </View>
+          <Animated.Image
+            style={[
+              styles.artwork,
+              {
+                height: artworkSize,
+                width: artworkSize,
+                borderRadius: artworkBorderRadius,
+                top: artworkTop,
+                left: artworkLeft
+              }
+            ]}
+            source={require("./assets/artwork.jpg")}
+          />
+        </TouchableOpacity>
+      </Animated.View>
+    </PanGestureHandler>
   );
 };
 
 export default PodcastLikeSemiModalView;
 
 const styles = StyleSheet.create({
-  groundwork: {
-    ...StyleSheet.absoluteFillObject,
-    paddingTop: 64,
-    alignItems: "center",
-    backgroundColor: "#eee"
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    marginBottom: 16
-  },
   button: {
     backgroundColor: "#ccc",
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 4,
     marginHorizontal: 8
-  },
-  state: {
-    fontWeight: "bold"
   },
 
   // main

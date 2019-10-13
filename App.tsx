@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import PodcastLikeSemiModalView, {
+import MusicAppLikeSemiModalView, {
   ModalState
-} from "./PodcastLikeSemiModalView";
+} from "./MusicAppLikeSemiModalView";
 
 export default function App() {
   const [modalState, setModalState] = useState<ModalState>("full");
@@ -34,7 +34,7 @@ export default function App() {
         <Text style={styles.state}>{modalState}</Text>
       </View>
 
-      <PodcastLikeSemiModalView
+      <MusicAppLikeSemiModalView
         modalState={modalState}
         setModalState={setModalState}
       />

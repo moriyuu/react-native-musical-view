@@ -29,7 +29,7 @@ type Props = {
   setModalState(modalState: ModalState): void;
 };
 
-const PodcastLikeSemiModalView: React.FC<Props> = props => {
+const MusicAppLikeSemiModalView: React.FC<Props> = props => {
   const { modalState, setModalState } = props;
 
   const prevModalState = usePrevious(modalState);
@@ -226,7 +226,7 @@ const PodcastLikeSemiModalView: React.FC<Props> = props => {
   );
 };
 
-export default PodcastLikeSemiModalView;
+export default MusicAppLikeSemiModalView;
 
 const styles = StyleSheet.create({
   button: {

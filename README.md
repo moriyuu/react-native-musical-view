@@ -4,4 +4,4 @@
 
 [Source](https://github.com/moriyuu/react-native-musical-view/blob/master/MusicAppLikeSemiModalView.tsx)
 
-<img src="https://i.gyazo.com/ca41e95ff2aa3f35c0174b133de1e9de.gif" alt="Demo">
+Demo: https://i.gyazo.com/ca41e95ff2aa3f35c0174b133de1e9de.gif

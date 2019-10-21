@@ -189,7 +189,7 @@ const MusicAppLikeSemiModalView: React.FC<Props> = props => {
           >
             <View style={styles.pseudoSeekbar} />
             <Text style={styles.full_title} numberOfLines={1}>
-              #005 The Gratest Episode in the World
+              #005 The Greatest Episode in the World
             </Text>
             <TouchableOpacity
               style={[styles.button, { marginTop: 16 }]}
@@ -201,7 +201,7 @@ const MusicAppLikeSemiModalView: React.FC<Props> = props => {
 
           <Animated.View style={[styles.mini, { opacity: miniOpacity }]}>
             <Text style={styles.mini_title} numberOfLines={1}>
-              #005 The Gratest Episode in the World
+              #005 The Greatest Episode in the World
             </Text>
           </Animated.View>
           <View style={styles.gripBarWrapper}>

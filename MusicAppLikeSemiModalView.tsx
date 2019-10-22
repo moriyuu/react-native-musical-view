@@ -1,11 +1,12 @@
-import React, { useEffect, useRef, useMemo } from "react";
+import React, { useEffect, useRef, useMemo, useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
   TouchableOpacity,
   Animated,
-  Dimensions
+  Dimensions,
+  ScrollView
 } from "react-native";
 import { State, PanGestureHandler } from "react-native-gesture-handler";
 
@@ -31,6 +32,9 @@ type Props = {
 
 const MusicAppLikeSemiModalView: React.FC<Props> = props => {
   const { modalState, setModalState } = props;
+
+  const [bounces, setBounces] = useState(false);
+  const [scrollEnabled, setScrollEnabled] = useState(true);
 
   const prevModalState = usePrevious(modalState);
 
@@ -148,81 +152,181 @@ const MusicAppLikeSemiModalView: React.FC<Props> = props => {
     }
   };
 
+  const panGestureListener = ({ nativeEvent }) => {
+    // console.log(nativeEvent.translationY);
+    // console.log(bounces);
+    // console.log("ho");
+    const newScrollEnabled = nativeEvent.translationY < 0;
+    if (scrollEnabled !== newScrollEnabled) {
+      console.log("newScrollEnabled 1", newScrollEnabled);
+      setScrollEnabled(newScrollEnabled);
+    }
+  };
+
   const onHandlerStateChange = ({ nativeEvent }) => {
     if (nativeEvent.oldState === State.ACTIVE) {
       switchModalState(nativeEvent.translationY > 214 ? "mini" : "full");
     }
   };
 
-  return (
-    <PanGestureHandler
-      onGestureEvent={Animated.event(
-        [{ nativeEvent: { translationY: dragY } }],
-        { useNativeDriver: false }
-      )}
-      onHandlerStateChange={Animated.event([], {
-        listener: onHandlerStateChange
-      })}
-    >
-      <Animated.View
-        style={[
-          styles.modalView,
-          {
-            transform: [{ translateY }],
-            borderTopLeftRadius: borderRadius,
-            borderTopRightRadius: borderRadius
-          }
-        ]}
-      >
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={() => switchModalState("full")}
-        >
-          <Animated.View
-            style={[
-              styles.full_contentWrapper,
-              {
-                opacity: fullOpacity,
-                paddingTop: fullContentWrapperPaddingTop
-              }
-            ]}
-          >
-            <View style={styles.pseudoSeekbar} />
-            <Text style={styles.full_title} numberOfLines={1}>
-              #005 The Greatest Episode in the World
-            </Text>
-            <TouchableOpacity
-              style={[styles.button, { marginTop: 16 }]}
-              onPress={() => switchModalState("mini")}
-            >
-              <Text>Mini</Text>
-            </TouchableOpacity>
-          </Animated.View>
+  const onScroll = ({ nativeEvent }) => {
+    // console.log(nativeEvent);
+    // console.log(bounces);
+    // console.log(nativeEvent.contentOffset.y);
 
-          <Animated.View style={[styles.mini, { opacity: miniOpacity }]}>
-            <Text style={styles.mini_title} numberOfLines={1}>
-              #005 The Greatest Episode in the World
-            </Text>
-          </Animated.View>
-          <View style={styles.gripBarWrapper}>
-            <Animated.View style={[styles.gripBar, { opacity: fullOpacity }]} />
-          </View>
-          <Animated.Image
-            style={[
-              styles.artwork,
-              {
-                height: artworkSize,
-                width: artworkSize,
-                borderRadius: artworkBorderRadius,
-                top: artworkTop,
-                left: artworkLeft
-              }
-            ]}
-            source={require("./assets/artwork.jpg")}
-          />
-        </TouchableOpacity>
-      </Animated.View>
-    </PanGestureHandler>
+    const newBounces = nativeEvent.contentOffset.y > 100;
+    if (bounces !== newBounces) setBounces(newBounces);
+
+    const newScrollEnabled = nativeEvent.contentOffset.y !== 0;
+    if (scrollEnabled !== newScrollEnabled) {
+      // console.log("newScrollEnabled 2", newScrollEnabled);
+      // setScrollEnabled(newScrollEnabled);
+    }
+  };
+
+  // console.log(scrollEnabled);
+
+  return (
+    <Animated.ScrollView
+      // disableScrollViewPanResponder
+      // maximumZoomScale={2}
+      // bounces={bounces}
+      // scrollEnabled={scrollEnabled}
+      onScroll={onScroll}
+      style={[
+        styles.modalView,
+        {
+          transform: [{ translateY }],
+          borderTopLeftRadius: borderRadius,
+          borderTopRightRadius: borderRadius
+        }
+      ]}
+    >
+      <PanGestureHandler
+        onGestureEvent={Animated.event(
+          [{ nativeEvent: { translationY: dragY } }],
+          {
+            useNativeDriver: false,
+            listener: panGestureListener
+          }
+        )}
+        onHandlerStateChange={Animated.event([], {
+          listener: onHandlerStateChange
+        })}
+      >
+        <Animated.View>
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => switchModalState("full")}
+          >
+            <Animated.View
+              style={[
+                styles.full_contentWrapper,
+                {
+                  opacity: fullOpacity,
+                  paddingTop: fullContentWrapperPaddingTop
+                }
+              ]}
+            >
+              <View style={styles.pseudoSeekbar} />
+              <Text style={styles.full_title} numberOfLines={1}>
+                #005 The Greatest Episode in the World
+              </Text>
+              <TouchableOpacity
+                style={[styles.button, { marginTop: 16 }]}
+                onPress={() => switchModalState("mini")}
+              >
+                <Text>Mini</Text>
+              </TouchableOpacity>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+              <Text>#005 The Greatest Episode in the World</Text>
+            </Animated.View>
+
+            <Animated.View style={[styles.mini, { opacity: miniOpacity }]}>
+              <Text style={styles.mini_title} numberOfLines={1}>
+                #005 The Greatest Episode in the World
+              </Text>
+            </Animated.View>
+            <View style={styles.gripBarWrapper}>
+              <Animated.View
+                style={[styles.gripBar, { opacity: fullOpacity }]}
+              />
+            </View>
+
+            <Animated.Image
+              style={[
+                styles.artwork,
+                {
+                  height: artworkSize,
+                  width: artworkSize,
+                  borderRadius: artworkBorderRadius,
+                  top: artworkTop,
+                  left: artworkLeft
+                }
+              ]}
+              source={require("./assets/artwork.jpg")}
+            />
+          </TouchableOpacity>
+        </Animated.View>
+      </PanGestureHandler>
+    </Animated.ScrollView>
   );
 };
 
